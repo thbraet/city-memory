@@ -52,11 +52,32 @@ by cost (€0 subdomain vs ~€10/yr real domain) with the ad-network consequenc
 of each, AdSense vs subdomain-friendly networks, DNS records, verification,
 and the single config file to paste IDs into.
 
-## The honest catch, decided up front
+## The honest catch — researched, and it resolved better than expected
 
-A truly free *real* domain does not exist in 2026. Free options are
-subdomains (`*.pages.dev`, `eu.org`, `js.org`, `is-a.dev`). Google AdSense
-generally will not approve a site on a subdomain the publisher does not own
-the root of. So the plan builds a **network-agnostic** ad layer: it works
-with AdSense the day a real domain exists, and with subdomain-friendly
-networks before that. The research phase verifies this rather than assuming it.
+The plan assumed a free subdomain could not carry AdSense, and that ~€10/yr
+for a domain would be the one unavoidable cost. Twelve research agents went
+at this, and two of them reached opposite conclusions, so the claim went
+through an adversarial check against primary sources. The result:
+
+**AdSense on `*.pages.dev` is documented as allowed.** Google's own site
+policy lists exactly three kinds of site you may add, one of which is
+"subdomains on platforms that are already part of the public suffix list",
+and `pages.dev` is on that list (checked against the published list dated
+2026-09-18). The widespread claim that free subdomains cannot be monetised
+traces to forum threads, not to Google, and the agent asserting it could not
+produce a primary source. So the €0 path is intact, and the ad layer targets
+AdSense directly rather than hedging across low-quality networks that would
+have been the fallback.
+
+Two things the research changed for real:
+
+- **Vercel is out.** Its Fair Use Guidelines name AdSense as commercial usage
+  and restrict the free tier to non-commercial personal use. Netlify's free
+  tier now pauses the site when monthly credits run out. Cloudflare Pages has
+  no equivalent clause. That decision is now evidence-based rather than taste.
+- **Belgian law wants a name and a geographic address** on an ad-funded site
+  (Code of Economic Law, Art. XII.6), and ad income may make the owner a
+  *zelfstandige in bijberoep*, whose social contributions could exceed what a
+  site this size earns. Neither is a coding problem, and both belong in the
+  owner's hands before ads go live — so both are in MANUAL-STEPS.md, near the
+  top rather than buried.
