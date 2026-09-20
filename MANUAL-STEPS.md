@@ -78,7 +78,7 @@ Settings to enter:
 | Production branch | `main` |
 | Build command | `npm run build:site` |
 | Build output directory | `dist` |
-| Environment variable | `NODE_VERSION` = `22` |
+| Environment variable | `NODE_VERSION` = `22` (also pinned in `.node-version`) |
 
 Not `npm run build` — that would also rebuild the API, which needs the 25 MB
 OpenStreetMap cache that is not in the repo. The API is committed, so

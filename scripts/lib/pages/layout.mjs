@@ -6,6 +6,8 @@
 // name will index nothing useful — and pages nobody can find earn nothing. So
 // the text lives in the markup, and the game hangs off it.
 import { enabled } from '../site-config.mjs';
+import { routeFor, homeFor } from './routes.mjs';
+import { bundleFor } from './strings/index.mjs';
 
 /** Escape text for an HTML text node or a double-quoted attribute. */
 export const esc = (value) => String(value)
@@ -36,6 +38,10 @@ export function document(page, ctx) {
   const { site } = ctx;
   const title = page.title === site.name ? site.name : `${page.title} — ${site.name}`;
   const canonical = ctx.url(page.url);
+  // The furniture speaks the page's language. A French page inside an English
+  // header reads as a machine translation of somebody else's site, and the
+  // "Play" link pointing at the Dutch home page would strand the reader there.
+  const t = bundleFor(page.lang ?? site.defaultLanguage);
 
   return `<!doctype html>
 <html lang="${esc(page.lang ?? site.defaultLanguage)}">
@@ -54,17 +60,17 @@ ${hreflang(page, ctx)}${verification(ctx)}<meta property="og:type" content="webs
 <meta property="og:image" content="${esc(ctx.url('/og.png'))}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/icon-180.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="stylesheet" href="/styles.css">
 <link rel="alternate" type="application/json" href="${esc(ctx.url('/api/v1/index.json'))}" title="City Memory API">
 ${consentDefaults(ctx)}${page.head ?? ''}</head>
 <body class="page${page.wide ? ' page-wide' : ''}">
-${siteHeader(page, ctx)}
+${siteHeader(page, ctx, t)}
 <main class="content" id="main">
 ${page.body}
 </main>
-${siteFooter(ctx)}
+${siteFooter(ctx, t)}
 ${analytics(ctx)}${page.scripts ?? ''}</body>
 </html>
 `;
@@ -113,44 +119,74 @@ function analytics(ctx) {
 
 // ------------------------------------------------------------------ furniture
 
-function siteHeader(page, ctx) {
+function siteHeader(page, ctx, t) {
+  const lang = page.lang ?? ctx.site.defaultLanguage;
+  const home = homeFor(lang);
   const nav = [
-    ['/', 'Play'],
-    ['/provincies', 'Provinces'],
-    ['/api/', 'API'],
-    ['/about', 'About'],
+    [home, t.common.nav.play],
+    [routeFor(lang, 'provinces'), t.common.nav.provinces],
+    ['/api/', t.common.nav.api],
+    ['/about', t.common.nav.about],
   ];
-  return `<a class="skip" href="#main">Skip to content</a>
+  return `<a class="skip" href="#main">${esc(t.common.nav.skip)}</a>
 <header class="site-header">
-  <a class="site-name" href="/">${esc(ctx.site.name)}</a>
-  <nav class="site-nav" aria-label="Main">
+  <a class="site-name" href="${esc(home)}">${esc(ctx.site.name)}</a>
+  <nav class="site-nav" aria-label="${esc(t.common.nav.play)}">
 ${nav.map(([href, label]) => `    <a href="${esc(href)}"${page.url === href ? ' aria-current="page"' : ''}>${esc(label)}</a>`).join('\n')}
   </nav>
-</header>`;
+${languageSwitcher(page, ctx, t)}</header>`;
 }
 
-function siteFooter(ctx) {
+/**
+ * The visible way between languages.
+ *
+ * hreflang tells a search engine the translations exist; it does nothing for a
+ * reader who landed on the Dutch page and wants the French one. Only pages that
+ * declare alternates get this, which is exactly the tier-one set — the 565
+ * municipality pages exist once, in one language-neutral form, and have nothing
+ * to switch to.
+ */
+function languageSwitcher(page, ctx, t) {
+  if (!page.alternates || page.alternates.length < 2) return '';
+  const label = { nl: 'Nederlands', fr: 'Français', en: 'English' };
+  return `  <nav class="lang-switch" aria-label="${esc(t.common.nav.language)}">
+${page.alternates.map((alt) => (alt.lang === page.lang
+    ? `    <span aria-current="true" lang="${esc(alt.lang)}">${esc(label[alt.lang] ?? alt.lang)}</span>`
+    : `    <a href="${esc(alt.url)}" lang="${esc(alt.lang)}" hreflang="${esc(alt.lang)}">${esc(label[alt.lang] ?? alt.lang)}</a>`)).join('\n')}
+  </nav>
+`;
+}
+
+function siteFooter(ctx, t) {
   const { site } = ctx;
+  const f = t.common.footer;
   const support = [];
-  if (site.support.kofi) support.push(`<a href="https://ko-fi.com/${esc(site.support.kofi)}" rel="noopener">Buy me a coffee</a>`);
-  if (site.support.githubSponsors) support.push(`<a href="https://github.com/sponsors/${esc(site.support.githubSponsors)}" rel="noopener">Sponsor</a>`);
+  if (site.support.kofi) support.push(`<a href="https://ko-fi.com/${esc(site.support.kofi)}" rel="noopener">${esc(f.kofi)}</a>`);
+  if (site.support.githubSponsors) support.push(`<a href="https://github.com/sponsors/${esc(site.support.githubSponsors)}" rel="noopener">${esc(f.sponsor)}</a>`);
 
   // The consent link only exists when there is a CMP to reopen. Google's EU
   // user consent policy requires a way back to the choice, and a banner with no
   // way back is the most common enforcement finding there is.
   const consentLink = enabled.ads(site)
-    ? `\n  <a href="#" onclick="googlefc&amp;&amp;googlefc.callbackQueue&amp;&amp;googlefc.callbackQueue.push(googlefc.showRevocationMessage);return false">Cookie settings</a>`
+    ? `\n  <a href="#" onclick="googlefc&amp;&amp;googlefc.callbackQueue&amp;&amp;googlefc.callbackQueue.push(googlefc.showRevocationMessage);return false">${esc(f.cookies)}</a>`
     : '';
 
+  // The repository link is a configured value like any other, so an unset one
+  // renders nothing rather than sending every visitor to a placeholder 404.
+  const sourceLink = site.repository
+    ? `\n  <a href="${esc(site.repository)}" rel="noopener">${esc(f.source)}</a>`
+    : '';
+
+  const osmLink = (label) => `<a href="https://www.openstreetmap.org/copyright" rel="noopener">${esc(label)}</a>`;
+
   return `<footer class="site-footer">
-  <p>Boundaries © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, ODbL. Names and shapes are an OSM extract and may lag reality.</p>
-  <nav aria-label="Site">
-  <a href="/about">About</a>
-  <a href="/privacy">Privacy</a>
-  <a href="/terms">Terms</a>
-  <a href="/legal">Legal notice</a>
-  <a href="/api/">API</a>
-  <a href="${esc(site.repository)}" rel="noopener">Source</a>${support.length ? '\n  ' + support.join('\n  ') : ''}${consentLink}
+  <p>${f.attribution({ osmLink })}</p>
+  <nav aria-label="${esc(f.about)}">
+  <a href="/about">${esc(f.about)}</a>
+  <a href="/privacy">${esc(f.privacy)}</a>
+  <a href="/terms">${esc(f.terms)}</a>
+  <a href="/legal">${esc(f.legal)}</a>
+  <a href="/api/">${esc(f.api)}</a>${sourceLink}${support.length ? '\n  ' + support.join('\n  ') : ''}${consentLink}
   </nav>
 </footer>`;
 }

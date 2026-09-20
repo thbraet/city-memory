@@ -1,3 +1,4 @@
 node_modules/
 data/raw/
 .DS_Store
+dist/

@@ -21,6 +21,7 @@ import { topology } from 'topojson-server';
 import { neighbors } from 'topojson-client';
 
 import { PROVINCES, REGIONS } from './lib/regions.mjs';
+import { slugify, fold } from './lib/slug.mjs';
 import {
   loadWgs84, areaKm2, representativePoint, bbox,
   simplifyTogether, roundGeometry, countPositions, polygonsOf,
@@ -35,7 +36,7 @@ const OUT = p('public/api', API_VERSION);
 
 // Where the API lives once deployed. Overridable so a fork can publish its own
 // copy without every `links` field pointing back here.
-const BASE = (process.env.API_BASE_URL ?? 'https://citymemory.pages.dev').replace(/\/$/, '');
+const BASE = (process.env.API_BASE_URL ?? 'https://city-memory.pages.dev').replace(/\/$/, '');
 const SELF = `${BASE}/api/${API_VERSION}`;
 
 // Three levels of detail, because one size genuinely does not fit:
@@ -186,7 +187,7 @@ async function main() {
         self: `${SELF}/municipalities/${r.id}.json`,
         collection: `${SELF}/municipalities.json`,
         province: `${SELF}/provinces/${r.province}.json`,
-        map: `${BASE}/gemeente/${slug(r)}`,
+        map: `${BASE}/gemeente/${slugify(displayName(r))}`,
       },
     });
   }
@@ -377,18 +378,6 @@ function displayName(r) {
     default: return r.nameNl || r.nameFr;
   }
 }
-
-export function slug(r) {
-  return fold(displayName(r).split(' / ')[0])
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-export const fold = (s) => s
-  .normalize('NFD')
-  .replace(/\p{Diacritic}/gu, '')
-  .toLowerCase()
-  .trim();
 
 const round2 = (n) => Math.round(n * 100) / 100;
 

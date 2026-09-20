@@ -1,0 +1,76 @@
+name: Deploy to GitHub Pages
+
+# The fallback host. Cloudflare Pages is the primary one and needs no workflow
+# at all: it clones the repo and runs the build itself. This exists so that
+# losing Cloudflare, or changing your mind about it, is one run of a workflow
+# rather than a migration. Read the caveats in DEPLOY.md before relying on it:
+# GitHub Pages ignores _headers and _redirects, and a project site served from
+# /<repo>/ breaks every root-absolute link the generated pages use.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One publish at a time, and never cancelled halfway: an interrupted deploy
+# leaves the live site on whichever version happened to land last.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+
+      - run: npm ci
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      # build:site rather than `npm run build`, for the same reason as in CI:
+      # build:api needs the gitignored data/raw/ cache, and public/api/v1/ is
+      # committed output. SITE_ORIGIN moves every canonical URL and sitemap
+      # entry to wherever Pages is actually serving this, so the two hosts do
+      # not advertise each other's addresses.
+      - run: npm run build:site
+        env:
+          SITE_ORIGIN: ${{ steps.pages.outputs.origin }}
+
+      # A project site lives at https://USER.github.io/REPO/, and every link in
+      # the generated pages starts with a slash, so they would all resolve
+      # against the wrong root. This is a warning rather than a failure because
+      # the deploy is still worth having for a look at the pages themselves.
+      - name: Warn when Pages serves this from a sub-path
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          set -euo pipefail
+          case "$BASE_PATH" in
+            ''|'/') exit 0 ;;
+          esac
+          echo "::warning::GitHub Pages is serving this under $BASE_PATH, so the site's root-absolute links will 404. Use a custom domain, or a USER.github.io repository, for a working fallback."
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

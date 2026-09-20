@@ -17,7 +17,7 @@ export const site = {
   // The canonical origin, no trailing slash. Until a domain exists this is the
   // Cloudflare Pages subdomain, which is a perfectly good public address.
   // Changing it rewrites every canonical URL, sitemap entry and API link.
-  origin: process.env.SITE_ORIGIN ?? 'https://citymemory.pages.dev',
+  origin: process.env.SITE_ORIGIN ?? 'https://city-memory.pages.dev',
 
   // Shown on /about and in the API contact field. A real address is required by
   // Belgian law for a site that carries advertising (see MANUAL-STEPS.md);
@@ -25,11 +25,20 @@ export const site = {
   // the contact address below.
   owner: {
     name: '',
+    // A geographic address, not a PO box. Belgian law (Code of Economic Law,
+    // Art. XII.6) requires one on any online service, and an ad-funded site is
+    // unambiguously one. If you do not want your home address public, arrange a
+    // business or domiciliation address BEFORE switching ads on.
+    address: '',
     email: '',
     country: 'Belgium',
+    enterpriseNumber: '', // KBO/BCE number, if you register as a zelfstandige
+    vat: '',
   },
 
-  repository: 'https://github.com/USERNAME/city-memory',
+  // Filled in once the repo exists. Empty means the footer shows no source
+  // link at all, rather than sending every visitor to a placeholder 404.
+  repository: '',
 
   // ------------------------------------------------------------------- ads
   ads: {
@@ -39,9 +48,9 @@ export const site = {
     // ad account, not a degraded one.
     adsensePublisherId: '',
 
-    // Slot ids from the AdSense "Ad units" tab. A slot with no id renders a
-    // reserved empty box of the right size, so the layout never shifts when the
-    // ads do arrive — the placement is designed for now and filled in later.
+    // Slot ids from the AdSense "Ad units" tab. A slot with no id renders
+    // nothing at all — no placeholder, no reserved box. Most visitors see the
+    // no-ad layout anyway, so that is the layout the pages are designed for.
     slots: {
       belowGame: '',   // after a round ends, where attention is already loose
       sidebar: '',     // desktop only, beside the start screen

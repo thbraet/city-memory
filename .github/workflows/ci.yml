@@ -1,0 +1,89 @@
+name: CI
+
+# Pushes are watched on the default branch only. Work on any other branch
+# reaches us as a pull request, and listening to both would run the same commit
+# twice for no extra information.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer commit on the same branch makes the older run's answer irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+
+      # A full install, not --omit=dev: d3-geo, topojson-*, osmtogeojson and
+      # jsdom are devDependencies, but the site build and the DOM test are the
+      # things being checked here, and they need them.
+      - run: npm ci
+
+      - run: npm test
+
+      # Deliberately build:site and not the full `npm run build`. build:api
+      # reads data/raw/, the 25 MB Overpass cache, which is gitignored because
+      # it is a download rather than a source; build:api exits 1 without it.
+      # public/api/v1/ is committed output, so the site build has everything it
+      # needs from the checkout alone. That is also exactly what Cloudflare
+      # Pages runs, so this step fails for the same reasons a deploy would.
+      # Refreshing the API data is a local job, and its result arrives here as
+      # a commit.
+      - run: npm run build:site
+
+      # build-site.mjs already refuses to finish a build that breaks the
+      # Cloudflare limits, so this step mostly guards against dist/ being
+      # absent, empty or missing its entry point. The two rule counts are the
+      # limits the build does not know about.
+      - name: Check dist/ against the Cloudflare Pages limits
+        run: |
+          set -euo pipefail
+          for required in dist/index.html dist/_headers dist/_redirects; do
+            test -s "$required" || { echo "missing or empty: $required"; exit 1; }
+          done
+
+          files=$(find dist -type f | wc -l | tr -d ' ')
+          total_kib=$(du -sk dist | cut -f1)
+          largest_kib=$(find dist -type f -exec du -k {} + | sort -n | tail -1 | cut -f1)
+          oversized=$(find dist -type f -size +26214400c)
+          header_rules=$(grep -cE '^[^[:space:]#]' dist/_headers || true)
+          redirect_rules=$(grep -cE '^[^[:space:]#]' dist/_redirects || true)
+
+          fail=0
+          if [ "$files" -gt 20000 ]; then
+            echo "$files files, over the 20,000 a Cloudflare Pages deploy allows"; fail=1
+          fi
+          if [ -n "$oversized" ]; then
+            echo "over the 25 MiB per-file limit:"; echo "$oversized"; fail=1
+          fi
+          if [ "$header_rules" -gt 100 ]; then
+            echo "$header_rules rules in _headers, over the 100 Cloudflare applies"; fail=1
+          fi
+          if [ "$redirect_rules" -gt 2000 ]; then
+            echo "$redirect_rules rules in _redirects, over the 2,000 Cloudflare applies"; fail=1
+          fi
+
+          {
+            echo "| dist/ | value | limit |"
+            echo "| --- | --- | --- |"
+            echo "| files | $files | 20,000 |"
+            echo "| total size | $((total_kib / 1024)) MiB | none |"
+            echo "| largest file | $((largest_kib / 1024)) MiB | 25 |"
+            echo "| _headers rules | $header_rules | 100 |"
+            echo "| _redirects rules | $redirect_rules | 2,000 |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit "$fail"

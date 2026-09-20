@@ -5,7 +5,11 @@ import { createStore } from './store.js';
 import { createMap } from './map.js';
 import { el, $, displayName, fullName, promptNode, formatPercent } from './ui.js';
 
-const DATA = 'public/data/';
+// Root-absolute, not relative: the published site has a home page per language,
+// and from /fr/ a relative path would fetch /fr/public/data/. Both the dev
+// server and the CDN serve the repo layout from /, so this resolves identically
+// in both.
+const DATA = '/public/data/';
 // A miss is left on screen longer than a hit: there are two shapes to take in,
 // and you have something to learn from it.
 const FEEDBACK_HIT_MS = 900;
@@ -43,6 +47,12 @@ async function boot() {
     return;
   }
   state.byId = new Map(state.index.municipalities.map((m) => [m.id, m]));
+  // The province and region pages send people here with ?scope=antwerpen as
+  // their call to action; an id that is not in the index (a stale link, a typo,
+  // a municipality merged away) is ignored rather than left to blow up in
+  // showStart(), which assumes the current scope exists.
+  const wanted = new URLSearchParams(window.location.search).get('scope');
+  if (wanted && state.index.scopes.some((s) => s.id === wanted)) state.scopeId = wanted;
   const stamp = document.getElementById('extract-stamp');
   if (stamp && state.index.osmTimestamp) {
     stamp.textContent = ` · OSM extract ${state.index.osmTimestamp.slice(0, 10)}`;

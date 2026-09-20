@@ -24,8 +24,21 @@ const p = (...s) => path.join(root, ...s);
 const dist = p('dist');
 const log = (...a) => console.log(...a);
 
-// Copied verbatim. Everything else in the repo is development-only.
-const COPY = ['index.html', 'styles.css', 'src', 'public'];
+// What gets published, as source -> destination.
+//
+// Only public/api moves: the API is developed under public/ so that the dev
+// server and the tests reach it at the same path as everything else, but it is
+// *addressed* as /api/v1/ — by its own discovery document, by openapi.json, by
+// the _headers CORS rule, by robots.txt and by 589 links across the generated
+// pages. Copying public/ wholesale would publish it at /public/api/v1/ instead,
+// where every one of those addresses is a 404.
+const COPY = [
+  ['index.html', 'index.html'],
+  ['styles.css', 'styles.css'],
+  ['src', 'src'],
+  ['public/data', 'public/data'],  // src/app.js fetches /public/data/, so this one stays put
+  ['public/api', 'api'],
+];
 
 async function main() {
   if (!existsSync(p('public/api/v1/index.json'))) {
@@ -38,8 +51,8 @@ async function main() {
   await mkdir(dist, { recursive: true });
 
   log('2/4 Copying the site');
-  for (const entry of COPY) {
-    await cp(p(entry), path.join(dist, entry), { recursive: true });
+  for (const [from, to] of COPY) {
+    await cp(p(from), path.join(dist, to), { recursive: true });
   }
 
   log('3/4 Generating pages');
@@ -58,6 +71,14 @@ async function main() {
   for (const f of tooBig) problems.push(`${f.rel} is ${(f.size / 1e6).toFixed(1)} MB, over the 25 MB per-file limit`);
   for (const leak of ['node_modules', 'data/raw', 'test']) {
     if (existsSync(path.join(dist, leak))) problems.push(`${leak}/ leaked into dist/`);
+  }
+  // The API's own documentation is the thing most likely to be silently wrong,
+  // because nothing in a successful build looks at it.
+  if (!existsSync(path.join(dist, 'api/v1/index.json'))) {
+    problems.push('the API is not at /api/v1/, which is the only address anything uses for it');
+  }
+  if (existsSync(path.join(dist, 'public/api'))) {
+    problems.push('the API is also at /public/api/, so it would be crawled and served at two addresses');
   }
   if (problems.length) {
     console.error('\nThis build cannot be published:');

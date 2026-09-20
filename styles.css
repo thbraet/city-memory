@@ -305,3 +305,471 @@ button.ghost.icon { min-width: 40px; font-size: 1.15rem; line-height: 1; padding
   .prompt { order: -1; width: 100%; flex: 1 0 100%; }
   .inset { width: 126px; height: 112px; margin-top: -124px; }
 }
+
+/* ============================================================ generated pages
+
+   Everything below dresses the built pages — the provinces, the 565
+   municipality pages, the API docs and the legal texts. They are documents
+   rather than an application: they scroll, they have a header and a footer, and
+   their body carries `.page` (plus `.page-wide` where the game needs the room).
+
+   The game's body rules above pin the viewport open and forbid scrolling, which
+   is exactly wrong for a document, so the first job here is to undo them for
+   `.page` only. Everything else reuses the tokens already declared: same
+   palette, same --line hairlines, same --radius, same panel-on-background
+   rhythm, so a municipality page reads as the same site as the map. */
+
+body.page {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+
+  /* One measure for the header, the content and the footer, so the site name
+     sits above the first paragraph rather than drifting off to one side. It is
+     the game's own 960px, which .page-wide does not widen: the game caps itself
+     there whatever room it is given, and a header indented differently from the
+     thing under it is the sort of half-millimetre that makes a page look
+     assembled rather than designed. What .page-wide drops is the reading
+     measure, and that lives on .prose. */
+  --page-max: 960px;
+}
+
+/* Full-bleed bar, centred contents, no wrapper div to do it with. */
+.site-header,
+.site-footer,
+.content {
+  width: 100%;
+  padding-inline: max(16px, calc((100% - var(--page-max)) / 2));
+}
+
+.content { flex: 1 0 auto; padding-block: 24px 40px; }
+
+.skip {
+  position: fixed;
+  top: 8px;
+  left: -9999px;
+  z-index: 10;
+  padding: 11px 16px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+}
+.skip:focus { left: 8px; }
+
+/* ------------------------------------------------------ header and footer */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 20px;
+  padding-block: 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-name {
+  font-weight: 650;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.site-name:hover { color: var(--accent); }
+
+.site-nav { display: flex; flex-wrap: wrap; gap: 2px 18px; margin-left: auto; }
+.site-nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.92rem;
+  padding: 6px 0;
+}
+.site-nav a:hover { color: var(--ink); }
+.site-nav a[aria-current='page'] { color: var(--accent); font-weight: 600; }
+
+.site-footer {
+  padding-block: 20px calc(24px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+.site-footer p { margin: 0 0 10px; max-width: 70ch; }
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.site-footer a { color: var(--ink-soft); }
+.site-footer a:hover { color: var(--ink); }
+
+/* ------------------------------------------------------------------- prose */
+
+/* The headings above are sized for panel captions in the game: 0.85rem,
+   uppercase, letter-spaced. That reads as a label, not as the structure of a
+   1500-word privacy notice, so prose restates all three. */
+
+.prose {
+  max-width: 68ch;      /* ~65-70 characters; longer lines lose the reader */
+  line-height: 1.65;
+}
+
+.prose h1 {
+  font-size: clamp(1.55rem, 1.25rem + 1.5vw, 2.1rem);
+  line-height: 1.15;
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+}
+.prose h2 {
+  font-size: 1.25rem;
+  font-weight: 650;
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: -0.01em;
+  margin: 2em 0 0.5em;
+  line-height: 1.25;
+}
+.prose h3 {
+  font-size: 1.02rem;
+  font-weight: 650;
+  color: var(--ink);
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 1.7em 0 0.4em;
+}
+.prose h2 a { text-decoration: none; }
+.prose > :first-child { margin-top: 0; }
+
+.prose p { margin: 0 0 1em; }
+.prose ul, .prose ol { margin: 0 0 1em; padding-left: 1.3em; }
+.prose li { margin-bottom: 0.4em; }
+
+/* Scoped to .content rather than to .prose: the home page puts links in the
+   game's own panels, which are not prose, and an unstyled browser-blue link
+   next to the accent green is the one thing that gives a generated page away. */
+.content a { color: var(--accent); text-underline-offset: 0.17em; }
+.content a:hover { text-decoration-thickness: 2px; }
+
+a:focus-visible,
+.cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+.lede {
+  font-size: 1.1rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-bottom: 1.2em;
+}
+.muted { color: var(--ink-soft); font-size: 0.92rem; }
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: color-mix(in oklab, var(--line) 50%, transparent);
+  padding: 0.1em 0.35em;
+  border-radius: 5px;
+  overflow-wrap: anywhere;   /* API paths are long and must not widen the page */
+}
+
+pre.code {
+  margin: 0 0 1.2em;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  tab-size: 2;
+}
+pre.code code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+
+.callout {
+  margin: 1.4em 0;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout.warn {
+  border-left-color: var(--bad);
+  background: color-mix(in oklab, var(--bad) 8%, var(--panel));
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+a.cta { color: var(--accent-ink); }
+.cta:hover { background: color-mix(in oklab, var(--accent) 85%, var(--ink)); }
+
+/* ------------------------------------------------------------- breadcrumbs */
+
+.breadcrumbs { margin-bottom: 16px; font-size: 0.85rem; color: var(--ink-soft); }
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.breadcrumbs li + li::before { content: '/'; margin-right: 8px; opacity: 0.55; }
+.breadcrumbs a { color: inherit; }
+.breadcrumbs [aria-current='page'] { color: var(--ink); }
+
+/* -------------------------------------------------------- cards and blocks */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+  gap: 10px;
+  list-style: none;
+  margin: 0 0 1.4em;
+  padding: 0;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 0;
+  transition: border-color 0.15s;
+}
+.card:hover { border-color: var(--accent); }
+.card a { text-decoration: none; }
+.card a:hover { text-decoration: underline; }
+.card .muted { font-size: 0.85rem; }
+
+.region-block { margin: 2.2em 0; }
+.region-block h2 { margin-top: 0; }
+.region-block > p { color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 0.8em; }
+
+/* ------------------------------------------------------------------ tables */
+
+/* Mobile first, and one of these tables is 565 rows long.
+   Every table here stays a real table at every width. Turning one into its own
+   `display: block` scroller fits it on a phone, but it also costs the element
+   its table role in the accessibility tree, and there is no wrapper in the
+   markup to scroll in its place. So the columns wrap instead, and the cells
+   that cannot wrap on their own — a NIS code, an API path — are told they may
+   break anywhere. Nothing here scrolls sideways, including the page. */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.4em;
+  font-size: 0.92rem;
+}
+.prose th, .prose td {
+  padding: 8px 12px 8px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.prose th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.prose tbody tr:last-child td { border-bottom: 0; }
+.prose td a { text-decoration: none; }
+.prose td a:hover { text-decoration: underline; }
+.prose td code { font-size: 0.85em; }
+
+table.municipalities td:nth-child(2),
+table.municipalities td:nth-child(3),
+table.municipalities td:nth-child(4),
+table.municipalities th:nth-child(4) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+table.municipalities td:nth-child(4) { text-align: right; padding-right: 0; }
+
+/* Auto table layout hands nearly all the width to the column with the most
+   text, which leaves the paths broken into a three-character ribbon. Naming the
+   share stops that; the exact figure is just what keeps the longest path down
+   to two lines at 360px. */
+table.endpoints td:first-child,
+table.endpoints th:first-child { width: 42%; }
+table.endpoints .muted { display: block; margin-top: 2px; font-size: 0.85rem; }
+
+/* Four columns, three of them prose, one of them a storage key that cannot be
+   hyphenated. At 360px the three prose columns claim everything and the key is
+   left being broken into four-character pieces, so the whole table drops a step
+   in size on a phone to buy the key a readable column back. */
+table.cookie-table { font-size: 0.8rem; }
+table.cookie-table td:first-child,
+table.cookie-table th:first-child { width: 30%; }
+
+/* ------------------------------------------------- definition lists, chips */
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 18px;
+  margin: 0 0 1.4em;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.facts dt { color: var(--ink-soft); font-size: 0.85rem; padding-top: 0.15em; }
+.facts dd { margin: 0; }
+
+.fields { margin: 0 0 1.4em; }
+.fields dt { margin-top: 1em; }
+.fields dd { margin: 0.2em 0 0; padding-left: 14px; border-left: 2px solid var(--line); color: var(--ink-soft); }
+
+/* Sixteen neighbours as sixteen full-width rows is a column of single words.
+   Wrapping pills fit the same list in three lines and are easier to hit. */
+.neighbours {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 1.4em;
+  padding: 0;
+}
+.neighbours li { margin: 0; }
+.neighbours a {
+  display: inline-block;
+  padding: 7px 13px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.neighbours a:hover { border-color: var(--accent); }
+
+/* -------------------------------------------------------------- static maps */
+
+.map-figure {
+  margin: 1.6em 0;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.map-figure svg.static-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 68vh;
+}
+.map-figure figcaption {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+/* One municipality is one shape: blown up to the full column it tells you
+   nothing more than it does at postcard size, and it pushes the facts below
+   the fold. */
+.map-figure.single { max-width: 340px; }
+.map-figure.single svg.static-map { max-height: 300px; }
+
+svg.static-map path {
+  fill: var(--land);
+  fill-rule: evenodd;
+  stroke: var(--land-line);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;   /* one screen pixel at any viewBox scale */
+}
+.map-figure.single svg.static-map path { fill: color-mix(in oklab, var(--accent) 30%, var(--land)); }
+
+/* Every shape on a province map is a link, so it needs to behave like one. */
+svg.static-map a { cursor: pointer; }
+svg.static-map a:hover path { fill: color-mix(in oklab, var(--land) 65%, var(--accent)); }
+/* The outline comes from the link rule above and is left in place: a shape
+   changing colour is not a focus indicator when the shape you are looking at
+   might be the one behind the one with focus. */
+svg.static-map a:focus-visible path { fill: var(--accent); stroke: var(--accent); stroke-width: 2; }
+
+/* ---------------------------------------------------------------- ad slots */
+
+/* Two things have to be true here at the same time.
+   With no publisher id the slot is not in the markup at all — no element, no
+   placeholder — so the no-ad page, which is what most visitors get, reserves
+   nothing and this rule cannot touch it. When a slot IS rendered, it claims its
+   height before the ad arrives: an ad that drops in and shoves the text down is
+   cumulative layout shift, which Google counts against the page and AdSense
+   treats as a policy problem in its own right. */
+.ad-slot {
+  display: block;
+  min-height: 280px;
+  margin: 2em 0;
+  overflow: hidden;
+  contain: layout;
+}
+.ad-slot > ins { display: block; width: 100%; }
+
+/* --------------------------------------------------- the game inside a page */
+
+/* The home page runs the real game inside .content, and the game's own rules
+   above size .app against a body that is exactly one viewport tall and never
+   scrolls — which is precisely what the document shell no longer provides. So
+   .app is refitted to the flow: at least the room the header and footer leave
+   over, taller when a screen needs it, and the page scrolls rather than a box
+   inside it. Nesting a second scroller in the first is the thing to avoid; on a
+   phone you can never tell which one your thumb is about to move. */
+body.page-wide .content { display: flex; flex-direction: column; }
+body.page-wide .app {
+  flex: 1 0 auto;
+  overflow-y: visible;
+  padding-inline: 0;      /* .content already pays for the side gutter */
+}
+
+/* The province and region shortcuts on the home page — and the whole of it for
+   anyone whose JavaScript never arrives. */
+.scope-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+  gap: 0 20px;
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+}
+.scope-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+.scope-list a { color: inherit; text-decoration: none; }
+.scope-list a:hover { color: var(--accent); text-decoration: underline; }
+.scope-list .chip-count { margin-left: auto; white-space: nowrap; }
+
+/* ------------------------------------------------------------ wider screens */
+
+@media (min-width: 560px) {
+  /* A path gets to hold its own line only once there is room for the column
+     beside it. Below this the same rule would push the description off the
+     screen, which is the one outcome worth avoiding. */
+  table.endpoints td:first-child,
+  table.endpoints th:first-child { width: auto; white-space: nowrap; }
+  table.cookie-table { font-size: 0.92rem; }
+  table.cookie-table td:first-child,
+  table.cookie-table th:first-child { width: auto; min-width: 9em; }
+  .content { padding-block: 32px 56px; }
+  .site-header { padding-block: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta, .card, .neighbours a { transition: none; }
+}
