@@ -38,7 +38,7 @@ export const site = {
 
   // Filled in once the repo exists. Empty means the footer shows no source
   // link at all, rather than sending every visitor to a placeholder 404.
-  repository: '',
+  repository: 'https://github.com/thbraet/city-memory',
 
   // ------------------------------------------------------------------- ads
   ads: {
