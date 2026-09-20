@@ -1,0 +1,307 @@
+/* City Memory — one stylesheet, no build step, dark mode by preference. */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #f6f5f1;
+  --panel: #ffffff;
+  --ink: #1b1a17;
+  --ink-soft: #5d5a52;
+  --line: #d9d5cb;
+  --accent: #2f6f4e;
+  --accent-ink: #ffffff;
+
+  --land: #e6e2d7;
+  --land-line: #b9b2a2;
+  --good: #2f8a56;
+  --good-bright: #34c06f;
+  --bad: #c0392b;
+
+  --m-unseen: #e4e0d5;
+  --m-shaky: #e9b96b;
+  --m-solid: #6aa87f;
+
+  --radius: 12px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 6%), 0 8px 24px rgb(0 0 0 / 6%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a;
+    --panel: #1c1f25;
+    --ink: #eceae4;
+    --ink-soft: #a5a196;
+    --line: #2f343d;
+    --accent: #5fbf8b;
+    --accent-ink: #10231a;
+
+    --land: #2a2f37;
+    --land-line: #454c58;
+    --good: #46a877;
+    --good-bright: #58e39b;
+    --bad: #ef6b5b;
+
+    --m-unseen: #262a31;
+    --m-shaky: #a8762c;
+    --m-solid: #3f7f5c;
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 30%);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  flex: 1;
+  min-height: 0;          /* the play screen fills the viewport exactly ... */
+  overflow-y: auto;       /* ... while the longer screens scroll inside it */
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+h1 { font-size: 1.6rem; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: 0.85rem; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+h3 { font-size: 0.75rem; margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); font-weight: 600; }
+
+.masthead { display: flex; flex-direction: column; gap: 4px; }
+.tagline, .hint { color: var(--ink-soft); margin: 0; font-size: 0.9rem; }
+.notice { color: var(--ink-soft); margin: 0; }
+.notice.error { color: var(--bad); }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.panel.danger { border-color: color-mix(in oklab, var(--bad) 40%, var(--line)); }
+
+/* ------------------------------------------------------------------ controls */
+
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  min-height: 44px;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+}
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { opacity: 0.4; cursor: default; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 600; }
+button.danger { background: var(--bad); color: #fff; border-color: transparent; }
+button.ghost { background: transparent; border-color: transparent; color: var(--ink-soft); padding: 6px 10px; }
+button.ghost:hover { color: var(--ink); border-color: var(--line); }
+button.ghost.icon { min-width: 40px; font-size: 1.15rem; line-height: 1; padding: 6px 8px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; font-size: 0.9rem;
+}
+.chip.small { min-width: 56px; justify-content: center; }
+.chip.is-on { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 600; }
+.chip-count { font-size: 0.75rem; opacity: 0.65; font-variant-numeric: tabular-nums; }
+
+.size-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.slider { flex: 1; accent-color: var(--accent); min-height: 44px; }
+.size-label { font-variant-numeric: tabular-nums; color: var(--ink-soft); min-width: 96px; text-align: right; }
+.file { font: inherit; color: var(--ink-soft); }
+
+/* --------------------------------------------------------------- play screen */
+
+.play { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; height: 100%; }
+
+.topbar { display: flex; align-items: center; gap: 12px; }
+.topbar-right { margin-left: auto; display: flex; gap: 4px; }
+
+.prompt { flex: 1; text-align: center; min-height: 3.2rem; display: flex; align-items: center; justify-content: center; }
+.prompt-names { display: flex; flex-direction: column; line-height: 1.15; }
+.prompt-primary { font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
+.prompt-secondary { font-size: 0.9rem; color: var(--ink-soft); }
+.prompt-secondary.is-equal { font-size: 1.5rem; font-weight: 650; color: var(--ink); }
+
+.meter { height: 4px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.meter-fill { height: 100%; width: 0; background: var(--accent); transition: width 0.3s ease; }
+
+.stage {
+  flex: 1;
+  min-height: 180px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.stage.tall { min-height: 60dvh; }
+
+.feedback { min-height: 1.6rem; text-align: center; font-size: 0.95rem; }
+.good { color: var(--good); font-weight: 600; }
+.bad { color: var(--bad); font-weight: 600; }
+.keys { text-align: center; font-size: 0.78rem; }
+
+/* ----------------------------------------------------------------------- map */
+
+.map { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.map:active { cursor: grabbing; }
+
+.shape {
+  fill: var(--land);
+  fill-rule: evenodd;
+  stroke: var(--land-line);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: all;
+  transition: fill 0.25s ease;
+}
+.shape:hover { fill: color-mix(in oklab, var(--land) 80%, var(--accent)); }
+
+/* A fat transparent stroke over every shape, so a one-pixel municipality is
+   still something you can hit with a finger. Small shapes are painted last. */
+.hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 10;   /* screen pixels, thanks to non-scaling-stroke */
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+}
+
+/* Answer feedback. Right: bright green. Wrong: what you clicked goes red, and
+   the one you were looking for goes green. */
+.shape.is-correct,
+.shape.is-wrong,
+.shape.is-target {
+  stroke-width: 2;
+  transition: none;
+}
+.shape.is-correct { fill: var(--good-bright); stroke: var(--good-bright); animation: pop 0.4s ease; }
+.shape.is-target  { fill: var(--good); stroke: var(--good); animation: pulse 0.9s ease infinite; }
+.shape.is-wrong   { fill: var(--bad); stroke: var(--bad); animation: flash 0.45s ease; }
+
+.mark {
+  fill: none;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.mark.is-correct { stroke: var(--good-bright); animation: pop 0.4s ease; }
+.mark.is-target  { stroke: var(--good); animation: pulse 0.9s ease infinite; }
+.mark.is-wrong   { stroke: var(--bad); animation: flash 0.45s ease; }
+
+@keyframes flash { 0%, 100% { opacity: 1; } 35% { opacity: 0.35; } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes pop { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .shape.is-wrong, .shape.is-target, .shape.is-correct,
+  .mark { animation: none; }
+  .meter-fill { transition: none; }
+}
+
+.label {
+  /* font-size and stroke-width are set per label in map.js, in viewBox units */
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 650;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-linejoin: round;
+  pointer-events: none;
+  dominant-baseline: middle;
+}
+.label.good { fill: var(--good-bright); }
+.label.bad { fill: var(--bad); }
+.label.target { fill: var(--good); }
+
+/* The 19 Brussels communes are unclickable at national zoom, so they also get a
+   permanent corner inset on the Belgium map. */
+.inset {
+  position: relative;
+  align-self: flex-end;
+  width: 160px;
+  height: 140px;
+  margin-top: -152px;
+  margin-right: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 6px 6px;
+  box-shadow: var(--shadow);
+  z-index: 2;
+}
+.inset[hidden] { display: none; }
+.inset-title {
+  position: absolute; top: 3px; left: 8px;
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--ink-soft);
+}
+.inset .map { cursor: pointer; }
+
+/* ------------------------------------------------------------------ progress */
+
+.is-progress .shape { transition: none; }
+.shape.m-unseen { fill: var(--m-unseen); }
+.shape.m-shaky { fill: var(--m-shaky); }
+.shape.m-solid { fill: var(--m-solid); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.85rem; color: var(--ink-soft); }
+.key { display: inline-flex; align-items: center; gap: 7px; }
+.key::before { content: ''; width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--line); background: var(--m-unseen); }
+.key.m-shaky::before { background: var(--m-shaky); }
+.key.m-solid::before { background: var(--m-solid); }
+
+/* ------------------------------------------------------------------- summary */
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 12px; }
+.stat { text-align: center; }
+.stat-value { font-size: 1.8rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 0.75rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.stumbles { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.stumbles li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.stumbles li:last-child { border-bottom: 0; }
+.times { color: var(--bad); font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------------------------------- footer */
+
+.footer {
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+.footer a { color: inherit; }
+
+@media (max-width: 560px) {
+  .app { padding: 14px 12px 6px; }
+  .prompt-primary, .prompt-secondary.is-equal { font-size: 1.25rem; }
+  .topbar { flex-wrap: wrap; }
+  .prompt { order: -1; width: 100%; flex: 1 0 100%; }
+  .inset { width: 126px; height: 112px; margin-top: -124px; }
+}
