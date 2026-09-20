@@ -5,9 +5,13 @@
   "type": "module",
   "description": "Learn the location of every Belgian municipality.",
   "scripts": {
+    "start": "node scripts/serve.mjs",
+    "serve:dist": "node scripts/serve.mjs 8080 dist",
+    "build": "npm run build:api && npm run build:site",
     "build:data": "node scripts/build-data.mjs",
-    "test": "node --test test/",
-    "start": "node scripts/serve.mjs"
+    "build:api": "node scripts/build-api.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "test": "node --test test/"
   },
   "devDependencies": {
     "osmtogeojson": "^3.0.0-beta.5",
