@@ -392,6 +392,25 @@ body.page {
 .site-nav a:hover { color: var(--ink); }
 .site-nav a[aria-current='page'] { color: var(--accent); font-weight: 600; }
 
+/* The language switcher. Only the tier-one pages have translations to offer, so
+   most pages never render this; it sits after the nav and wraps below it on a
+   phone rather than competing with it for the same row. */
+.lang-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  width: 100%;
+  padding-bottom: 4px;
+  font-size: 0.82rem;
+}
+.lang-switch a { color: var(--ink-soft); text-decoration: none; }
+.lang-switch a:hover { color: var(--ink); text-decoration: underline; }
+.lang-switch [aria-current='true'] { color: var(--ink); font-weight: 600; }
+
+@media (min-width: 640px) {
+  .lang-switch { width: auto; padding-bottom: 0; }
+}
+
 .site-footer {
   padding-block: 20px calc(24px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
