@@ -796,8 +796,6 @@ body.page-wide .app {
 
 /* Names stay above the linked shapes and never intercept a click. */
 .map-names, .map-hover-name { pointer-events: none; }
-.map-names { visibility: hidden; }
-.show-map-names .map-names { visibility: visible; }
 .map-names text, .map-hover-name text {
   text-anchor: middle;
   dominant-baseline: central;

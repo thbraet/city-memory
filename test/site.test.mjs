@@ -529,3 +529,32 @@ async function buildWith(mutate) {
     await rm(dir, { recursive: true, force: true });
   }
 }
+
+siteTest('province names start hidden and toggle without a stylesheet', async () => {
+  const { JSDOM } = await import('jsdom');
+  const dom = new JSDOM(await readFile(path.join(dist, 'provincie/antwerpen/index.html'), 'utf8'), {
+    runScripts: 'outside-only',
+  });
+  const { document, MouseEvent } = dom.window;
+  const layer = document.querySelector('.map-names');
+  const toggle = document.querySelector('.map-names-toggle');
+  const hidden = () => dom.window.getComputedStyle(layer).display === 'none';
+  assert.ok(hidden(), 'names hidden even before JavaScript and CSS load');
+  dom.window.eval(await readFile(path.join(dist, 'src/explore-map.js'), 'utf8'));
+  assert.ok(hidden(), 'initialization keeps names hidden');
+  assert.equal(toggle.getAttribute('aria-pressed'), 'false');
+  for (let i = 0; i < 2; i++) {
+    toggle.click();
+    assert.ok(!hidden(), 'first click shows names');
+    assert.equal(toggle.getAttribute('aria-pressed'), 'true');
+    toggle.click();
+    assert.ok(hidden(), 'second click hides names again');
+    assert.equal(toggle.getAttribute('aria-pressed'), 'false');
+  }
+  const link = document.querySelector('.static-map a');
+  link.querySelector('path').dispatchEvent(new MouseEvent('pointerover', { bubbles: true }));
+  assert.equal(document.querySelector('.map-hover-name').textContent, link.getAttribute('aria-label'));
+  assert.ok(hidden(), 'hover does not reveal the other names');
+  assert.equal(document.querySelectorAll('.static-map title').length, 0);
+  dom.window.close();
+});

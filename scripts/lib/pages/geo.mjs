@@ -375,14 +375,14 @@ function mapFigure(t, members, nationalPaths, slugs, caption) {
   <button type="button" class="map-names-toggle" aria-pressed="false" hidden>${esc(t.common.mapNames)}</button>
   <svg viewBox="${esc(box)}" role="group" aria-label="${esc(caption)}" class="static-map">
 ${entries.map(({ member: m, shape: s }) => `    <a href="/gemeente/${esc(slugs.get(m.nis))}" data-id="${esc(m.nis)}" aria-label="${esc(m.name)}"><path d="${esc(s.path)}"/></a>`).join('\n')}
-  <g class="map-names" aria-hidden="true" font-size="${width / 75}">
+  <g class="map-names" style="display: none" aria-hidden="true" font-size="${width / 75}">
 ${entries.map(({ member: m, shape: s }) => `    <text data-id="${esc(m.nis)}" x="${s.centroid[0]}" y="${s.centroid[1]}">${esc(m.name)}</text>`).join('\n')}
   </g>
   <g class="map-hover-name" aria-hidden="true" font-size="${width / 48}"></g>
   </svg>
   <figcaption>${t.common.figureCaption({ caption: esc(caption) })}</figcaption>
 </figure>
-<script type="module" src="/src/explore-map.js"></script>`;
+<script type="module" src="/src/explore-map.js?v=2"></script>`;
 }
 
 /** One municipality on its own, at the detail the province file carries. */

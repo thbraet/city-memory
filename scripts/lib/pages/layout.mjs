@@ -62,7 +62,7 @@ ${hreflang(page, ctx)}${verification(ctx)}<meta property="og:type" content="webs
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/styles.css?v=map-names-2">
 <link rel="alternate" type="application/json" href="${esc(ctx.url('/api/v1/index.json'))}" title="City Memory API">
 ${consentDefaults(ctx)}${page.head ?? ''}</head>
 <body class="page${page.wide ? ' page-wide' : ''}">
