@@ -4,8 +4,9 @@ A browser game for learning the location of every Belgian municipality. The game
 names a municipality; you click its shape on the map. Miss it and it comes back
 later in the round.
 
-See [PLAN.md](PLAN.md) for the design and [data/REPORT.md](data/REPORT.md) for
-what the last data build produced, including the decisions it had to make.
+See [data/REPORT.md](data/REPORT.md) for what the last data build produced,
+including implementation decisions, and [PUBLISH-PLAN.md](PUBLISH-PLAN.md) for
+the publishing plan.
 
 ## Play
 
@@ -22,6 +23,11 @@ municipalities to drill. Two correct clicks in a row retire an item; a miss puts
 it back a few prompts later. Scroll, pinch or use the ± buttons to zoom, drag to
 pan, `space` to give up on a prompt, `Esc` to end the round. Progress is stored
 per NIS code in `localStorage` and can be exported to JSON.
+
+Choose **Study map** to explore a labelled map without a quiz. Filter Belgium
+by region and province, then zoom and pan to read names in dense areas. Tap a
+municipality for its full name. Studying does not change your progress. You can
+also open `/?view=study` directly, or add `&scope=namur` to start with a scope.
 
 ## Test
 

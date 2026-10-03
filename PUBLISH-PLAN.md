@@ -3,6 +3,45 @@
 Goal: the game live on a public domain, a public read-only API over the same
 data, and ad slots that can earn something — all on free tiers, €0 spent.
 
+## Launch review — 2026-10-03
+
+- Implemented locally: static API, generated site and SEO pages, optional ad
+  placements, consent defaults, legal pages, hosting headers and rewrites,
+  and GitHub Actions workflows. The latest local check passed all 157 tests.
+- GitHub remote and repository link are configured. Local changes remain
+  uncommitted; the remote's current visibility and CI status are unverified.
+- First launch is game and API only, as chosen by the owner. Cloudflare Pages
+  is deployed at `https://city-memory.pages.dev`. Live homepage, API docs,
+  JSON and GeoJSON endpoints, extensionless API rewrite, province-page redirect
+  and sitemap respond successfully. JSON CORS and GeoJSON content type work.
+  Live cache headers revealed overlapping lifetimes; the local fix passes all
+  157 tests and still needs to be pushed, deployed and checked live.
+  The configured origin is `https://city-memory.pages.dev`.
+  If the actual origin differs, update both the site configuration and the
+  committed API's absolute URLs, as described in DEPLOY.md.
+- Analytics, donation links, search verification, AdSense IDs and owner contact
+  details are empty. Decide which features to enable for the first launch;
+  advertising setup is a separate follow-up.
+- API design differs from the original proposal below: search is one
+  `/api/v1/search.json` index, and province/region collections replace the
+  proposed generic `/scopes` endpoints. Mutable API URLs use finite caching
+  rather than immutable caching. Decide whether these differences are acceptable.
+- Consent implementation uses denied defaults and Google's dashboard-managed
+  CMP. Setting a publisher ID loads the AdSense script immediately; the original
+  promise below that no script loads before a choice does not describe the code.
+  Before enabling ads, configure the CMP and verify actual consent behaviour.
+  Cloudflare analytics is intentionally independent of ad consent.
+- GitHub Actions, `.node-version` and Cloudflare instructions now select Node
+  22. A successful run on that runtime remains to be confirmed in GitHub CI.
+- GitHub Pages is configured to deploy on pushes to main as well as manually.
+  Confirm whether that fallback should be enabled: its project-subpath links
+  are known to be unsuitable without a custom domain or root repository.
+
+The phases below preserve the original proposal. MANUAL-STEPS.md supplies the
+account setup instructions; DEPLOY.md supplies the deployment checks. Hosting,
+advertising and legal policy claims below require current verification before
+they are relied on for launch.
+
 ## Constraints that shape everything
 
 1. **€0.** No registrar fee, no paid plan, no card on file. Anything that

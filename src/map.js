@@ -39,8 +39,9 @@ export function createMap(container, { onPick, interactive = true } = {}) {
   function scaleLabels() {
     const size = view.w / 46;
     for (const label of labels.children) {
-      label.setAttribute('font-size', size);
-      label.setAttribute('stroke-width', size / 4);
+      const labelSize = label.dataset.studySize ? Math.min(Number(label.dataset.studySize), view.w / 75) : size;
+      label.setAttribute('font-size', labelSize);
+      label.setAttribute('stroke-width', labelSize / 4);
     }
     for (const mark of marks.children) {
       mark.setAttribute('r', view.w / 55);
@@ -152,6 +153,25 @@ export function createMap(container, { onPick, interactive = true } = {}) {
   function resetView() {
     view = { ...base };
     applyView();
+  }
+
+  // Fit every name near its shape at overview scale, then cap its size as the
+  // user zooms in. Names remain present at every zoom; none are culled.
+  function showStudyLabels(nameFor) {
+    labels.replaceChildren();
+    for (const [id, entry] of byId) {
+      const text = nameFor(id);
+      const label = document.createElementNS(SVG_NS, 'text');
+      label.setAttribute('x', entry.feature.centroid[0]);
+      label.setAttribute('y', entry.feature.centroid[1]);
+      label.setAttribute('class', 'label study-label');
+      label.setAttribute('text-anchor', 'middle');
+      label.dataset.id = id;
+      label.dataset.studySize = entry.size / Math.max(4, text.length * 0.55);
+      label.textContent = text;
+      labels.append(label);
+    }
+    scaleLabels();
   }
 
   /** Centre the view on a feature without changing the zoom level. */
@@ -303,7 +323,7 @@ export function createMap(container, { onPick, interactive = true } = {}) {
 
   return {
     svg, load, setState, clearStates, setMastery, showLabel,
-    resetView, centreOn, zoomBy,
+    resetView, centreOn, zoomBy, showStudyLabels,
     get ids() { return [...byId.keys()]; },
     feature: (id) => byId.get(id)?.feature ?? null,
     element: (id) => byId.get(id)?.path ?? null,

@@ -254,3 +254,37 @@ test('a wrong answer paints the click red and the right shape green', async () =
     'the one you wanted goes green');
   assert.equal(document.querySelectorAll('.shapes path.is-target').length, 1, 'exactly one right answer shown');
 });
+
+test('study map labels every municipality and filters by region and province', async () => {
+  const progress = JSON.stringify(app.state.store.all());
+  app.state.scopeId = 'belgium';
+  await app.showStudy();
+  assert.equal(document.querySelectorAll('.study-label').length, 565);
+  assert.equal(app.state.round, null);
+  const region = document.querySelector('#study-region');
+  const province = document.querySelector('#study-province');
+  region.value = 'wallonia';
+  region.dispatchEvent(new window.Event('change'));
+  await until(() => document.querySelectorAll('.study-label').length === 261);
+  assert.ok(![...province.options].some((o) => o.value === 'antwerpen'));
+  province.value = 'namur';
+  province.dispatchEvent(new window.Event('change'));
+  await until(() => document.querySelectorAll('.study-label').length === 38);
+  assert.equal(app.state.scopeId, 'namur');
+  const svg = document.querySelector('.study-stage svg');
+  const before = svg.getAttribute('viewBox');
+  document.querySelector('[aria-label="Zoom in"]').click();
+  assert.notEqual(svg.getAttribute('viewBox'), before);
+  assert.equal(document.querySelectorAll('.study-label').length, 38);
+  region.value = 'brussels';
+  region.dispatchEvent(new window.Event('change'));
+  await until(() => document.querySelectorAll('.study-label').length === 19);
+  assert.equal(province.disabled, true);
+  assert.equal(province.value, '');
+  document.querySelector('.study-stage .shape').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  assert.equal(JSON.stringify(app.state.store.all()), progress, 'studying never changes progress');
+  region.value = '';
+  region.dispatchEvent(new window.Event('change'));
+  await until(() => document.querySelectorAll('.study-label').length === 565);
+  assert.equal(province.disabled, false);
+});

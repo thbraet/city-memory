@@ -1,6 +1,6 @@
 # City Memory — build report
 
-## Decisions this build made that PLAN.md did not specify
+## Decisions this build made beyond the original implementation plan
 
 Nothing in the plan turned out to be blocked. All five phases are implemented and
 every acceptance check in the plan's "Autonomous execution" section passes. The

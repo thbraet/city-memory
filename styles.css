@@ -263,6 +263,14 @@ button.ghost.icon { min-width: 40px; font-size: 1.15rem; line-height: 1; padding
 }
 .inset .map { cursor: pointer; }
 
+/* --------------------------------------------------------------------- study */
+.study-filters { display: flex; flex-wrap: wrap; gap: 12px; }
+.study-field { display: flex; flex: 1 1 180px; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.study-field select { width: 100%; min-height: 44px; padding: 8px 12px; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.study-field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.study-stage { flex: none; height: 65dvh; min-height: 360px; }
+.study-label { font-weight: 500; }
+
 /* ------------------------------------------------------------------ progress */
 
 .is-progress .shape { transition: none; }

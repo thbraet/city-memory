@@ -107,11 +107,8 @@ function manifest(ctx) {
 function headers(ctx) {
   return `# Cloudflare Pages reads this file.
 #
-# Each block repeats its full header set rather than relying on a more general
-# block to supply the rest. Whether Cloudflare merges matching rules or lets the
-# most specific one win is not something this file should be betting the API's
-# CORS headers on, and at six rules against a limit of a hundred, repetition
-# costs nothing.
+# Matching rules merge. Keep cache lifetimes in the resource-specific blocks
+# and shared security headers in the catch-all so values are not duplicated.
 
 /api/*
   Access-Control-Allow-Origin: *
@@ -121,12 +118,7 @@ function headers(ctx) {
   X-Content-Type-Options: nosniff
 
 /api/v1/geo/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
-  Access-Control-Max-Age: 86400
   Content-Type: application/geo+json; charset=utf-8
-  Cache-Control: public, max-age=3600, stale-while-revalidate=604800
-  X-Content-Type-Options: nosniff
 
 # The game's own data. Same bytes for everyone, replaced wholesale by a rebuild.
 /public/data/*
@@ -144,7 +136,6 @@ function headers(ctx) {
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
-  Cache-Control: public, max-age=600, must-revalidate
 `;
 }
 
