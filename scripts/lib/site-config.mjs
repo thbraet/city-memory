@@ -80,7 +80,7 @@ export const site = {
   // ------------------------------------------------------------ verification
   // Meta-tag verification tokens. Each is a bare token, not the whole tag.
   verification: {
-    google: '',   // Google Search Console
+    google: '0N6bhDt5WkgyKCuAFy061uRsRCLeWAT540HY2u_BKCQ', // Google Search Console
     bing: '',     // Bing Webmaster Tools
   },
 
