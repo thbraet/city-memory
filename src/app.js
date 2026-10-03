@@ -58,8 +58,7 @@ async function boot() {
     stamp.textContent = ` · OSM extract ${state.index.osmTimestamp.slice(0, 10)}`;
   }
   document.addEventListener('keydown', onKey);
-  if (new URLSearchParams(window.location.search).get('view') === 'study') showStudy();
-  else showStart();
+  showStart();
 }
 
 const jsonCache = new Map();
@@ -138,7 +137,6 @@ function showStart(message) {
     ),
     el('div', { class: 'actions' },
       el('button', { type: 'button', class: 'primary', onclick: () => startRound() }, 'Start round'),
-      el('button', { type: 'button', onclick: showStudy }, 'Study map'),
       el('button', { type: 'button', onclick: showProgress }, 'Progress map'),
       el('button', { type: 'button', onclick: showSettings }, 'Progress data'),
     ),
@@ -156,93 +154,6 @@ function progressSummary(scope) {
   const out = { unseen: 0, shaky: 0, solid: 0 };
   for (const m of scopeMembers(scope.id)) out[mastery(state.store.get(m.id))]++;
   return out;
-}
-
-// ---------------------------------------------------------------- study screen
-function showStudy() {
-  clearTimeout(state.settle);
-  state.round = null;
-  state.busy = false;
-  const scopes = state.index.scopes;
-  const provinces = scopes.filter((s) => s.kind === 'province' && s.id !== 'brussels');
-  const regions = [...new Map(state.index.municipalities.map((m) =>
-    [m.region, { id: m.region, name: m.regionName }])).values()];
-  const current = scopes.find((s) => s.id === state.scopeId);
-  let provinceId = provinces.some((s) => s.id === current.id) ? current.id : '';
-  let regionId = provinceId
-    ? state.index.municipalities.find((m) => m.province === provinceId).region
-    : regions.some((s) => s.id === current.id) ? current.id : '';
-  const option = (id, name) => el('option', { value: id }, name);
-  const country = el('select', { id: 'study-country' }, option('belgium', 'Belgium'));
-  const region = el('select', { id: 'study-region' }, option('', 'All regions'),
-    regions.map((s) => option(s.id, s.name)));
-  const province = el('select', { id: 'study-province' });
-  region.value = regionId;
-  function updateProvinces() {
-    const available = provinces.filter((s) => !regionId || state.index.municipalities.some(
-      (m) => m.province === s.id && m.region === regionId));
-    province.replaceChildren(option('', regionId === 'brussels' ? 'No provinces' : 'All provinces'),
-      ...available.map((s) => option(s.id, s.name)));
-    province.value = provinceId;
-    province.disabled = available.length === 0;
-  }
-  updateProvinces();
-  const stage = el('div', { class: 'stage study-stage' });
-  const status = el('p', { class: 'hint', role: 'status', 'aria-live': 'polite' });
-  const readout = el('p', { class: 'hint', 'aria-live': 'polite' }, 'Tap a municipality to see its full name.');
-  let map;
-  let request = 0;
-  async function updateMap() {
-    const version = ++request;
-    const id = provinceId || regionId || 'belgium';
-    state.scopeId = id;
-    stage.replaceChildren();
-    map = null;
-    status.textContent = 'Loading map…';
-    readout.textContent = 'Tap a municipality to see its full name.';
-    try {
-      const scope = await loadScope(id);
-      if (version !== request || !stage.isConnected) return;
-      map = createMap(stage, { onPick: (nis) => { readout.textContent = fullName(state.byId.get(nis)); } });
-      map.load(scope);
-      map.svg.setAttribute('aria-label', `Study map: ${scopes.find((s) => s.id === id).name}`);
-      map.showStudyLabels((nis) => fullName(state.byId.get(nis)));
-      status.textContent = `${scopes.find((s) => s.id === id).name} · ${scope.features.length} municipalities`;
-    } catch (err) {
-      if (version !== request || !stage.isConnected) return;
-      status.replaceChildren('Could not load the map. ', el('button', { type: 'button', onclick: updateMap }, 'Retry'));
-    }
-  }
-  region.addEventListener('change', () => {
-    regionId = region.value;
-    provinceId = '';
-    updateProvinces();
-    updateMap();
-  });
-  province.addEventListener('change', () => {
-    provinceId = province.value;
-    if (provinceId) {
-      regionId = state.index.municipalities.find((m) => m.province === provinceId).region;
-      region.value = regionId;
-      updateProvinces();
-    }
-    updateMap();
-  });
-  const field = (name, select) => el('label', { class: 'study-field', for: select.id }, name, select);
-  render(
-    el('header', { class: 'masthead' }, el('h1', {}, 'Study map'),
-      el('p', { class: 'tagline' }, 'Learn the names and shapes before starting a round.')),
-    el('div', { class: 'study-filters' }, field('Country', country), field('Region', region), field('Province', province)),
-    el('p', { class: 'hint' }, 'Belgium is currently available. All names are shown; zoom in or choose a smaller area to read dense places.'),
-    el('div', { class: 'actions' },
-      el('button', { type: 'button', 'aria-label': 'Zoom out', onclick: () => map?.zoomBy(1.5) }, '−'),
-      el('button', { type: 'button', 'aria-label': 'Zoom in', onclick: () => map?.zoomBy(1 / 1.5) }, '+'),
-      el('button', { type: 'button', onclick: () => map?.resetView() }, 'Reset view'),
-      el('button', { type: 'button', onclick: () => showStart() }, 'Back to start')),
-    status, stage, readout,
-    el('p', { class: 'hint' }, 'Scroll, pinch or ± to zoom · drag to pan'),
-  );
-  return updateMap();
 }
 
 // ----------------------------------------------------------------- play screen
@@ -536,6 +447,6 @@ function exportProgress() {
 }
 
 // Exposed so the DOM smoke test can drive a round without scraping globals.
-globalThis.cityMemory = { state, startRound, answer, showStart, showProgress, showStudy };
+globalThis.cityMemory = { state, startRound, answer, showStart, showProgress };
 
 boot();

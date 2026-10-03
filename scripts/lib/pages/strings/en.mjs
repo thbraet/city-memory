@@ -94,6 +94,7 @@ export const strings = {
     },
 
     // Under every map. The credit is required by the ODbL, so keep it.
+    mapNames: 'All municipality names',
     figureCaption: ({ caption }) => `${caption}. Boundaries © OpenStreetMap contributors.`,
 
     tableHeaders: {

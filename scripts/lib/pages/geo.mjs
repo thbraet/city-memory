@@ -366,15 +366,23 @@ ${neighbours.map((n) => `    <li><a href="/gemeente/${esc(n.slug)}">${esc(n.name
 
 /** A province- or region-sized map, drawn from the coarse national paths. */
 function mapFigure(t, members, nationalPaths, slugs, caption) {
-  const shapes = members.map((m) => nationalPaths.get(m.nis)).filter(Boolean);
-  if (!shapes.length) return '';
-  const box = fitBox(shapes);
-  return `<figure class="map-figure">
-  <svg viewBox="${esc(box)}" role="img" aria-label="${esc(caption)}" class="static-map">
-${shapes.map((s, i) => `    <a href="/gemeente/${esc(slugs.get(members[i].nis))}"><path d="${esc(s.path)}"><title>${esc(members[i].name)}</title></path></a>`).join('\n')}
+  const entries = members.map((m) => ({ member: m, shape: nationalPaths.get(m.nis) }))
+    .filter(({ shape }) => shape);
+  if (!entries.length) return '';
+  const box = fitBox(entries.map(({ shape }) => shape));
+  const width = Number(box.split(' ')[2]);
+  return `<figure class="map-figure explorable-map">
+  <button type="button" class="map-names-toggle" aria-pressed="false" hidden>${esc(t.common.mapNames)}</button>
+  <svg viewBox="${esc(box)}" role="group" aria-label="${esc(caption)}" class="static-map">
+${entries.map(({ member: m, shape: s }) => `    <a href="/gemeente/${esc(slugs.get(m.nis))}" data-id="${esc(m.nis)}" aria-label="${esc(m.name)}"><path d="${esc(s.path)}"><title>${esc(m.name)}</title></path></a>`).join('\n')}
+  <g class="map-names" aria-hidden="true" font-size="${width / 75}">
+${entries.map(({ member: m, shape: s }) => `    <text data-id="${esc(m.nis)}" x="${s.centroid[0]}" y="${s.centroid[1]}">${esc(m.name)}</text>`).join('\n')}
+  </g>
+  <g class="map-hover-name" aria-hidden="true" font-size="${width / 48}"></g>
   </svg>
   <figcaption>${t.common.figureCaption({ caption: esc(caption) })}</figcaption>
-</figure>`;
+</figure>
+<script type="module" src="/src/explore-map.js"></script>`;
 }
 
 /** One municipality on its own, at the detail the province file carries. */

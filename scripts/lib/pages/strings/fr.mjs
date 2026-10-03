@@ -78,6 +78,7 @@ export const strings = {
 
     // The credit is required by the ODbL, so keep it. "les contributeurs
     // OpenStreetMap" is the wording the francophone OSM community uses itself.
+    mapNames: 'Tous les noms des communes',
     figureCaption: ({ caption }) => `${caption}. Limites © les contributeurs OpenStreetMap.`,
 
     tableHeaders: {

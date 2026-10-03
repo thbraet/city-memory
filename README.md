@@ -11,11 +11,14 @@ the publishing plan.
 ## Play
 
 ```sh
-npm start            # http://localhost:8080/
+npm start            # build and serve the full site at http://localhost:8080/
 ```
 
-Anything that serves this folder over HTTP works — `python3 -m http.server`, a
-static host, whatever. Opening `index.html` from the filesystem does **not**,
+This includes the top navigation, language links, and generated reference pages.
+Restart `npm start` after editing files to rebuild the site. For standalone game
+development, `npm run dev` serves the source files directly, without the site
+navigation; changes appear on refresh. Any static HTTP server can also serve
+the built `dist/` folder. Opening `index.html` from the filesystem does **not**,
 because the page fetches its data as JSON and `file://` blocks that.
 
 Pick a scope (Belgium, a region, or one of the provinces) and how many
@@ -24,10 +27,9 @@ it back a few prompts later. Scroll, pinch or use the ± buttons to zoom, drag t
 pan, `space` to give up on a prompt, `Esc` to end the round. Progress is stored
 per NIS code in `localStorage` and can be exported to JSON.
 
-Choose **Study map** to explore a labelled map without a quiz. Filter Belgium
-by region and province, then zoom and pan to read names in dense areas. Tap a
-municipality for its full name. Studying does not change your progress. You can
-also open `/?view=study` directly, or add `&scope=namur` to start with a scope.
+Open **Provincies** and choose a province to explore its existing map. Hover
+or keyboard-focus a municipality to see its name, or toggle **Alle gemeentenamen**
+to display every name. Clicking a municipality opens its detail page.
 
 ## Test
 

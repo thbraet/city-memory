@@ -263,13 +263,6 @@ button.ghost.icon { min-width: 40px; font-size: 1.15rem; line-height: 1; padding
 }
 .inset .map { cursor: pointer; }
 
-/* --------------------------------------------------------------------- study */
-.study-filters { display: flex; flex-wrap: wrap; gap: 12px; }
-.study-field { display: flex; flex: 1 1 180px; flex-direction: column; gap: 4px; font-size: 0.85rem; }
-.study-field select { width: 100%; min-height: 44px; padding: 8px 12px; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
-.study-field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.study-stage { flex: none; height: 65dvh; min-height: 360px; }
-.study-label { font-weight: 500; }
 
 /* ------------------------------------------------------------------ progress */
 
@@ -799,4 +792,25 @@ body.page-wide .app {
 
 @media (prefers-reduced-motion: reduce) {
   .cta, .card, .neighbours a { transition: none; }
+}
+
+/* Names stay above the linked shapes and never intercept a click. */
+.map-names, .map-hover-name { pointer-events: none; }
+.map-names { visibility: hidden; }
+.show-map-names .map-names { visibility: visible; }
+.map-names text, .map-hover-name text {
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: var(--ink);
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.map-hover-name text { font-weight: 700; stroke-width: 5px; }
+.map-names-toggle { margin-bottom: 12px; }
+.map-names-toggle[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
 }

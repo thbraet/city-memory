@@ -4,7 +4,7 @@
 //   node scripts/build-site.mjs
 //
 // Assembles everything that gets published into dist/. The repo root stays the
-// thing you develop against (`npm start` serves it directly, and the tests boot
+// thing you develop against (`npm run dev` serves it directly, and the tests boot
 // the real page from it); dist/ is what a host is pointed at, so node_modules,
 // the 25 MB OSM cache, the tests and the build scripts never leave the machine.
 //

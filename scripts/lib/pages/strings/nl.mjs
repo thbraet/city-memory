@@ -75,6 +75,7 @@ export const strings = {
     },
 
     // Under every map. The credit is required by the ODbL, so keep it.
+    mapNames: 'Alle gemeentenamen',
     figureCaption: ({ caption }) => `${caption}. Grenzen © OpenStreetMap-bijdragers.`,
 
     tableHeaders: {

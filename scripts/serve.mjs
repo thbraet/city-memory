@@ -2,9 +2,8 @@
 // A static file server, so the page can fetch its data over HTTP.
 //   node scripts/serve.mjs [port] [root]
 //
-// The default root is the repo, which is what you develop against. Pass `dist`
-// to serve a built site instead, which is the only way to check the generated
-// pages, the API headers story and the real link structure before deploying.
+// The default root is dist/, including the navigation and generated pages.
+// npm start builds it first. Pass `.` for the standalone game during development.
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
@@ -13,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const repo = fileURLToPath(new URL('..', import.meta.url));
 const port = Number(process.argv[2] ?? process.env.PORT ?? 8080);
-const root = path.resolve(repo, process.argv[3] ?? process.env.SERVE_ROOT ?? '.');
+const root = path.resolve(repo, process.argv[3] ?? process.env.SERVE_ROOT ?? 'dist');
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',

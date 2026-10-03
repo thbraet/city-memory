@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Learn the location of every Belgian municipality.",
   "scripts": {
+    "prestart": "npm run build:site",
     "start": "node scripts/serve.mjs",
+    "dev": "node scripts/serve.mjs 8080 .",
     "serve:dist": "node scripts/serve.mjs 8080 dist",
     "build": "npm run build:api && npm run build:site",
     "build:data": "node scripts/build-data.mjs",
