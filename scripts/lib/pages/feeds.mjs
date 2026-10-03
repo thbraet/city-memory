@@ -126,10 +126,10 @@ function headers(ctx) {
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /src/*
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, no-cache
 
 /styles.css
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, no-cache
 
 /*
   X-Content-Type-Options: nosniff
