@@ -12,6 +12,24 @@ revenue might collide is flagged at step 8, with what to do if it does.
 
 ---
 
+## Status — 2026-10-09
+
+| # | Step | State |
+|---|------|-------|
+| 1–4 | GitHub, Cloudflare, Pages, API headers | Done; preview deployments set to None |
+| 5 | Cloudflare Web Analytics | Done (token in `site-config.mjs`) |
+| 6 | Ko-fi | On hold — owner's decision |
+| 7 | Search Console + Bing | Verified, sitemap submitted to Google; Bing site imported, its sitemap submit errored server-side — retry under Bing → Sitemaps (it also reads `robots.txt`) |
+| 8 | AdSense | Apply on or after **2026-10-30** |
+| 9 | Consent message | After AdSense approval |
+| 10 | Legal identity | Waiting on owner details |
+| 11 | Accountant | Owner |
+
+The `belowGame` unit now also shows on the round summary screen of the game
+(hidden during play), so one ad unit id covers that and the geo pages.
+
+---
+
 ## The short version
 
 | # | Step | Time | Cost | Blocks |
