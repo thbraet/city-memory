@@ -34,6 +34,20 @@ const root = document.getElementById('app');
  *  rather than stringified into a stray "undefined" on the page. */
 function render(...nodes) {
   root.replaceChildren(...nodes.flat().filter((n) => n != null && n !== false));
+  showRoundEndAd(false);
+}
+
+/** The round-end ad slot sits outside #app (see scripts/lib/pages/game.mjs)
+ *  and only exists when ads are configured. It is filled the first time it is
+ *  shown, because AdSense cannot size an ad inside a hidden element. */
+function showRoundEndAd(show) {
+  const slot = document.getElementById('ad-round-end');
+  if (!slot) return;
+  slot.hidden = !show;
+  if (show && !slot.dataset.filled) {
+    slot.dataset.filled = '1';
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch { /* blocked */ }
+  }
 }
 
 async function boot() {
@@ -339,6 +353,7 @@ function endRound(abandoned = false) {
       el('button', { type: 'button', onclick: showProgress }, 'Progress map'),
     ),
   );
+  showRoundEndAd(true);
 }
 
 const stat = (value, label) => el('div', { class: 'stat' },

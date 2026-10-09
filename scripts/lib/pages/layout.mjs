@@ -249,13 +249,21 @@ export function breadcrumbs(trail, ctx) {
  * for, and an ad is something that appears within the flow rather than a hole
  * the page is built around.
  */
-export function adSlot(name, ctx) {
+export function adSlot(name, ctx, { id } = {}) {
   const { site } = ctx;
   const slot = site.ads.slots[name];
   if (!enabled.ads(site) || !slot) return '';
+  // With an id the slot starts hidden and unfilled: AdSense cannot size an ad
+  // inside display:none, so src/app.js unhides it and pushes it itself.
+  const ins = `<ins class="adsbygoogle" style="display:block" data-ad-client="${esc(site.ads.adsensePublisherId)}"
+       data-ad-slot="${esc(slot)}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
+  if (id) {
+    return `<aside class="ad-slot ad-${esc(name)}" id="${esc(id)}" aria-label="Advertisement" hidden>
+  ${ins}
+</aside>`;
+  }
   return `<aside class="ad-slot ad-${esc(name)}" aria-label="Advertisement">
-  <ins class="adsbygoogle" style="display:block" data-ad-client="${esc(site.ads.adsensePublisherId)}"
-       data-ad-slot="${esc(slot)}" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  ${ins}
   <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
 </aside>`;
 }

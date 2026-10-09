@@ -14,9 +14,10 @@
 // its first pass, a slow connection, a blocked module — gets a blank box. This
 // is why the intro needs no hiding logic and app.js needs no change for it.
 //
-// The ad slot is the one thing that has to sit outside #app, because anything
+// The ad slots are the one thing that has to sit outside #app, because anything
 // inside it is wiped on boot and an ad that survives for 300 ms is worth less
-// than no ad at all.
+// than no ad at all. The round-end slot starts hidden; src/app.js shows it on
+// the summary screen only, never over the map while someone is playing.
 import { document, esc, jsonLd, adSlot } from './layout.mjs';
 import { routeFor, homeFor, alternatesFor } from './routes.mjs';
 import { bundleFor } from './strings/index.mjs';
@@ -64,6 +65,7 @@ ${regions.map((r) => `      <li><a href="${esc(routeFor(lang, 'region', r.id))}"
     <p class="hint"><a href="${esc(routeFor(lang, 'provinces'))}">${esc(t.allProvinces)}</a></p>
   </section>
 </div>
+${adSlot('belowGame', ctx, { id: 'ad-round-end' })}
 ${adSlot('sidebar', ctx)}`;
 
   return {

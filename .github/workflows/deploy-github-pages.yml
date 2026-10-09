@@ -6,10 +6,10 @@ name: Deploy to GitHub Pages
 # rather than a migration. Read the caveats in DEPLOY.md before relying on it:
 # GitHub Pages ignores _headers and _redirects, and a project site served from
 # /<repo>/ breaks every root-absolute link the generated pages use.
+# Manual only: served from /city-memory/ it breaks every root-absolute link, so
+# an automatic deploy on every push would publish a broken copy of the site.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read

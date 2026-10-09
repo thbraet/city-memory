@@ -298,6 +298,15 @@ siteTest('with a publisher id, the tag ships behind consent defaults and ads.txt
   assert.ok(home.includes(`data-ad-client="${publisher}"`), 'the home page renders no ad slot');
   assert.ok(home.includes('showRevocationMessage'), 'there is no way back to the consent choice');
 
+  // The round-end slot lives outside #app, starts hidden and is filled by
+  // src/app.js on the summary screen — never pushed while it is invisible.
+  const roundEnd = home.match(/<aside[^>]*id="ad-round-end"[^>]*>[\s\S]*?<\/aside>/);
+  assert.ok(roundEnd, 'the home page has no round-end ad slot');
+  assert.match(roundEnd[0], /\shidden[\s>]/, 'the round-end slot is visible during play');
+  assert.ok(roundEnd[0].includes('data-ad-slot="1111111111"'), 'the round-end slot is not the belowGame unit');
+  assert.ok(!roundEnd[0].includes('.push('), 'the round-end slot is filled while hidden');
+  assert.ok(home.indexOf('id="ad-round-end"') > home.indexOf('id="app"'), 'the round-end slot is inside #app and gets wiped');
+
   // Every generated page, not just the home page: a page that loads the script
   // without the defaults is the one that gets the site a warning.
   for (const [file, body] of built) {
