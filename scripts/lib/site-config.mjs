@@ -66,7 +66,7 @@ export const site = {
   analytics: {
     // Cloudflare Web Analytics token. Cookieless and storage-free, so it needs
     // no consent banner. Empty means no analytics script at all.
-    cloudflareToken: '',
+    cloudflareToken: '778de75d4a4c46169732cdb4213b48df',
   },
 
   // -------------------------------------------------------------- donations
