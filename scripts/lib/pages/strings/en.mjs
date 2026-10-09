@@ -438,10 +438,5 @@ export const strings = {
     contentHeading: 'Content',
     content: ({ termsLink }) => `Map data © OpenStreetMap contributors, under the ODbL. Site code under the MIT licence.
   See the ${termsLink('terms')} for what that allows.`,
-
-    disputeHeading: 'Dispute resolution',
-    dispute: ({ odrLink }) => `The European Commission's online dispute resolution platform is at
-  ${odrLink('ec.europa.eu/consumers/odr')}.
-  Nothing is sold here, so it is unlikely to be needed.`,
   },
 };

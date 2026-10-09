@@ -275,9 +275,6 @@ ${site.owner.vat ? `    <dt>${esc(s.facts.vat)}</dt><dd>${esc(site.owner.vat)}</
 
   <h2>${s.contentHeading}</h2>
   <p>${s.content({ termsLink: link('/terms') })}</p>
-
-  <h2>${s.disputeHeading}</h2>
-  <p>${s.dispute({ odrLink: ext('https://ec.europa.eu/consumers/odr') })}</p>
 </article>`,
   });
 }

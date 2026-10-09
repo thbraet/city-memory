@@ -24,13 +24,13 @@ export const site = {
   // until one is set, /about says the site is run by an individual and gives
   // the contact address below.
   owner: {
-    name: '',
+    name: 'Thibauld Braet',
     // A geographic address, not a PO box. Belgian law (Code of Economic Law,
     // Art. XII.6) requires one on any online service, and an ad-funded site is
     // unambiguously one. If you do not want your home address public, arrange a
     // business or domiciliation address BEFORE switching ads on.
-    address: '',
-    email: '',
+    address: 'Schaluinveld 33 G003, 3290 Diest',
+    email: 'thibauld.braet@outlook.com',
     country: 'Belgium',
     enterpriseNumber: '', // KBO/BCE number, if you register as a zelfstandige
     vat: '',

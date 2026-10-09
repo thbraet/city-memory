@@ -22,7 +22,7 @@ revenue might collide is flagged at step 8, with what to do if it does.
 | 7 | Search Console + Bing | Verified, sitemap submitted to Google; Bing site imported, its sitemap submit errored server-side — retry under Bing → Sitemaps (it also reads `robots.txt`) |
 | 8 | AdSense | Apply on or after **2026-10-30** |
 | 9 | Consent message | After AdSense approval |
-| 10 | Legal identity | Waiting on owner details |
+| 10 | Legal identity | Done (owner name, address, email set) |
 | 11 | Accountant | Owner |
 
 The `belowGame` unit now also shows on the round summary screen of the game
